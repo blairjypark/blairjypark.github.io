@@ -611,6 +611,13 @@ function createPreview(imageUrl) {
     }
   }
 
+function preloadImages(uploadedImages) {
+  Object.values(uploadedImages).forEach(src => {
+    const img = new Image();
+    img.src = src;
+  });
+}
+
 (async () => {
   const uploadedImages = await loadUploadedImages();
 
@@ -619,6 +626,7 @@ function createPreview(imageUrl) {
     calendarConfig.month,
     uploadedImages
   );
+  preloadImages(uploadedImages);
 })();
 
 </script>
