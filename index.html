@@ -386,56 +386,52 @@
     year: 2026,
     month: 5,
     imageBasePath: "/images",
-    imageExtensions: ["JPG","jpg", "jpeg", "png", "webp"]
+    imageExtensions: ["jpg","png", "webp"]
   };
 
 async function loadUploadedImages() {
+
   const imageMap = {};
 
-  try {
-    const response = await fetch("https://blairjypark.github.io/images/");
+  const baseUrl = "https://blairjypark.github.io/images/";
 
-    if (!response.ok) {
-      throw new Error("이미지 폴더를 불러오지 못했습니다.");
+  const extensions = ["JPG", "JPEG", "PNG", "WEBP"];
+
+  const year = calendarConfig.year;
+  const month = calendarConfig.month;
+
+  const lastDate = new Date(year, month, 0).getDate();
+
+  for (let day = 1; day <= lastDate; day++) {
+
+    const dateKey =
+      `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+
+    for (const ext of extensions) {
+
+      const imageUrl = `${baseUrl}${dateKey}.${ext}`;
+
+      try {
+
+        const response = await fetch(imageUrl, {
+          method: "HEAD"
+        });
+
+        if (response.ok) {
+
+          imageMap[dateKey] = imageUrl;
+
+          break;
+        }
+
+      } catch (e) {
+
+        console.log("이미지 확인 실패:", imageUrl);
+      }
     }
-
-    const html = await response.text();
-
-    // GitHub Pages 디렉토리 listing 에서 href 추출
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, "text/html");
-
-    const links = [...doc.querySelectorAll("a")];
-
-    for (const link of links) {
-      const href = link.getAttribute("href");
-
-      if (!href) continue;
-
-      // 파일명만 추출
-      const fileName = href.split("/").pop();
-
-      if (!fileName) continue;
-
-      // 날짜 패턴 검사
-      const match = fileName.match(
-        /^(\d{4}-\d{2}-\d{2})\.(JPG|jpg|jpeg|png|webp)$/i
-      );
-
-      if (!match) continue;
-
-      const dateKey = match[1];
-
-      imageMap[dateKey] =
-        "https://blairjypark.github.io/images/" + fileName;
-    }
-
-    return imageMap;
-
-  } catch (error) {
-    console.error("이미지 목록 로딩 실패:", error);
-    return {};
   }
+
+  return imageMap;
 }
 
   function toDateKey(year, month, day) {
