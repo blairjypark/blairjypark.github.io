@@ -450,6 +450,7 @@ modalClose.addEventListener("click", closeModal);
     imageExtensions: ["jpg"]
   };
 
+/*
 async function loadUploadedImages() {
 
   const imageMap = {};
@@ -493,7 +494,47 @@ async function loadUploadedImages() {
   }
 
   return imageMap;
+}*/
+
+async function loadUploadedImages() {
+
+  const imageMap = {};
+  const baseUrl = "https://blairjypark.github.io/images/";
+  const extensions = ["JPG"];
+
+  const year = calendarConfig.year;
+  const month = calendarConfig.month;
+
+  const lastDate = new Date(year, month, 0).getDate();
+
+  const tasks = [];
+
+  for (let day = 1; day <= lastDate; day++) {
+
+    const dateKey =
+      `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+
+    for (const ext of extensions) {
+
+      const imageUrl = `${baseUrl}${dateKey}.${ext}`;
+
+      tasks.push(
+        fetch(imageUrl, { method: "HEAD" })
+          .then(response => {
+            if (response.ok) {
+              imageMap[dateKey] = imageUrl;
+            }
+          })
+          .catch(() => {})
+      );
+    }
+  }
+
+  await Promise.all(tasks);
+
+  return imageMap;
 }
+
 
   function toDateKey(year, month, day) {
     return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
