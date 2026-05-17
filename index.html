@@ -29,14 +29,13 @@
     color: #333;
   }
 
-  .sheet {
-    width: min(1040px, 100%);
-    background: var(--paper);
-    border: 1px solid #d9e1e5;
-    box-shadow: 0 12px 28px rgba(0, 62, 95, 0.18);
-    position: relative;
-    overflow: hidden;
-  }
+.sheet {
+  width: min(1040px, 100%);
+  background: var(--paper);
+  position: relative;
+  overflow: hidden;
+  border-radius: 24px;
+}
 
   .top-wave {
     position: relative;
@@ -165,46 +164,45 @@
     background: rgba(255,255,255,0.28) !important;
   }
 
-  .success-heart {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -42%);
-    width: 58px;
-    height: 52px;
-    cursor: pointer;
-    border: none;
-    background: transparent;
-    outline: none;
-  }
+.success-heart {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -42%);
+  width: 24px;
+  height: 22px;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  outline: none;
+}
 
-  .success-heart::before,
-  .success-heart::after {
-    content: "";
-    position: absolute;
-    width: 35px;
-    height: 52px;
-    background: rgba(236, 98, 126, 0.72);
-    border-radius: 35px 35px 0 0;
-    top: 0;
-  }
+.success-heart::before,
+.success-heart::after {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 22px;
+  background: rgba(236, 98, 126, 0.72);
+  border-radius: 14px 14px 0 0;
+  top: 0;
+}
 
-  .success-heart::before {
-    left: 27px;
-    transform: rotate(-45deg);
-    transform-origin: 0 100%;
-  }
+.success-heart::before {
+  left: 11px;
+  transform: rotate(-45deg);
+  transform-origin: 0 100%;
+}
 
-  .success-heart::after {
-    left: 0;
-    transform: rotate(45deg);
-    transform-origin: 100% 100%;
-  }
+.success-heart::after {
+  left: 0;
+  transform: rotate(45deg);
+  transform-origin: 100% 100%;
+}
 
-  .success-heart:hover {
-    transform: translate(-50%, -42%);
-  }
-
+.success-heart:hover {
+  transform: translate(-50%, -42%);
+}
   .preview {
     pointer-events: none;
     display: none;
@@ -226,11 +224,6 @@
     max-height: 300px;
     object-fit: contain;
     border-radius: 10px;
-  }
-
-  .success-heart:hover + .preview,
-  .success-heart:focus + .preview {
-    display: block;
   }
 
   .calendar td:first-child .preview {
@@ -322,6 +315,43 @@
     font-size: 70px;
   }
 
+.image-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.72);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+}
+
+.image-modal.open {
+  display: flex;
+}
+
+.image-modal img {
+  max-width: 92vw;
+  max-height: 82vh;
+  border-radius: 18px;
+  background: white;
+  object-fit: contain;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.image-modal-close {
+  position: absolute;
+  top: 18px;
+  right: 22px;
+  border: none;
+  background: rgba(255,255,255,0.9);
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  font-size: 24px;
+  cursor: pointer;
+}
+
 @media (max-width: 720px) {
   body {
     padding: 10px;
@@ -386,7 +416,33 @@
     </footer>
   </main>
 
+<div class="image-modal" id="image-modal">
+  <button class="image-modal-close" id="image-modal-close">×</button>
+  <img id="modal-image" src="" alt="확대 이미지" />
+</div>
+
 <script>
+const modal = document.getElementById("image-modal");
+const modalImage = document.getElementById("modal-image");
+const modalClose = document.getElementById("image-modal-close");
+
+function openModal(imageUrl) {
+  modalImage.src = imageUrl;
+  modal.classList.add("open");
+}
+
+function closeModal() {
+  modal.classList.remove("open");
+  modalImage.src = "";
+}
+
+modal.addEventListener("click", (e) => {
+  if (e.target === modal) {
+    closeModal();
+  }
+});
+
+modalClose.addEventListener("click", closeModal);
   const calendarConfig = {
     year: 2026,
     month: 5,
@@ -443,23 +499,27 @@ async function loadUploadedImages() {
     return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
   }
 
-  function createPreview(imageUrl) {
-    const heart = document.createElement("button");
-    heart.className = "success-heart";
-    heart.type = "button";
-    heart.setAttribute("aria-label", "성공 이미지 보기");
+function createPreview(imageUrl) {
+  const heart = document.createElement("button");
+  heart.className = "success-heart";
+  heart.type = "button";
+  heart.setAttribute("aria-label", "성공 이미지 보기");
 
-    const preview = document.createElement("div");
-    preview.className = "preview";
+  heart.addEventListener("click", () => {
+    openModal(imageUrl);
+  });
 
-    const img = document.createElement("img");
-    img.src = imageUrl;
-    img.alt = "음식물 남기지 않기 인증 이미지";
+  const preview = document.createElement("div");
+  preview.className = "preview";
 
-    preview.appendChild(img);
+  const img = document.createElement("img");
+  img.src = imageUrl;
+  img.alt = "음식물 남기지 않기 인증 이미지";
 
-    return [heart, preview];
-  }
+  preview.appendChild(img);
+
+  return [heart, preview];
+}
 
   function createCalendar(year, month, uploadedImages) {
     const tbody = document.getElementById("calendar-body");
