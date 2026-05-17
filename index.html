@@ -322,21 +322,25 @@
     font-size: 70px;
   }
 
-  @media (max-width: 720px) {
-    body {
-      padding: 10px;
-    }
-
-    .calendar-wrap {
-      padding: 0 8px 10px;
-      background: var(--paper);
-      overflow-x: auto;
-    }
-
-    .sheet {
-      min-width: 760px;
-    }
+@media (max-width: 720px) {
+  body {
+    padding: 10px;
   }
+
+  .calendar-wrap {
+    padding: 0 8px 10px;
+    background: var(--paper);
+  }
+
+  .sheet {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .preview {
+    display: none !important;
+  }
+}
 </style>
 </head>
 <body>
@@ -353,13 +357,13 @@
       <table class="calendar" aria-label="음식물 쓰레기 제로 달력">
         <thead>
           <tr>
-            <th>일요일</th>
-            <th>월요일</th>
-            <th>화요일</th>
-            <th>수요일</th>
-            <th>목요일</th>
-            <th>금요일</th>
-            <th>토요일</th>
+            <th>일</th>
+            <th>월</th>
+            <th>화</th>
+            <th>수</th>
+            <th>목</th>
+            <th>금</th>
+            <th>토</th>
           </tr>
         </thead>
         <tbody id="calendar-body"></tbody>
